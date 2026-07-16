@@ -45,3 +45,10 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const logout = async (_req: Request, res: Response) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+};

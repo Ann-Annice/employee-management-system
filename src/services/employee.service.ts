@@ -64,6 +64,7 @@ export const getEmployees = async (
     include: {
       department: true,
       manager: true,
+      reportees: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -86,6 +87,7 @@ export const getEmployeeById = async (id: string) => {
     include: {
       department: true,
       manager: true,
+      reportees: true,
     },
   });
 };
@@ -105,6 +107,45 @@ export const updateEmployee = async (
           },
         },
       }),
+      ...(data.managerId && {
+        manager: {
+          connect: {
+            id: data.managerId,
+          },
+        },
+      }),
+    },
+    include: {
+      department: true,
+      manager: true,
+      reportees: true,
+    },
+  });
+};
+
+export const deleteEmployee = async (id: string) => {
+  return prisma.employee.delete({
+    where: { id },
+  });
+};
+
+export const getOrganizationTree = async () => {
+  return prisma.employee.findMany({
+    include: {
+      department: true,
+      manager: true,
+      reportees: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+};
+
+export const getReportees = async (id: string) => {
+  return prisma.employee.findMany({
+    where: {
+      managerId: id,
     },
     include: {
       department: true,
@@ -113,8 +154,25 @@ export const updateEmployee = async (
   });
 };
 
-export const deleteEmployee = async (id: string) => {
-  return prisma.employee.delete({
-    where: { id },
+export const assignManager = async (
+  employeeId: string,
+  managerId: string
+) => {
+  return prisma.employee.update({
+    where: {
+      id: employeeId,
+    },
+    data: {
+      manager: {
+        connect: {
+          id: managerId,
+        },
+      },
+    },
+    include: {
+      department: true,
+      manager: true,
+      reportees: true,
+    },
   });
 };
