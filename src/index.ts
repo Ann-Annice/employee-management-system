@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 
 import authRoutes from "./routes/auth.routes";
 import employeeRoutes from "./routes/employee.routes";
+import departmentRoutes from "./routes/department.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 
 dotenv.config();
 
@@ -19,6 +21,8 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Home
 app.get("/", (_req, res) => {

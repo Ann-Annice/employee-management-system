@@ -96,24 +96,44 @@ export const updateEmployee = async (
   id: string,
   data: any
 ) => {
+  const {
+    departmentId,
+    managerId,
+    ...employeeData
+  } = data;
+
   return prisma.employee.update({
-    where: { id },
+    where: {
+      id,
+    },
     data: {
-      ...data,
-      ...(data.departmentId && {
+      ...employeeData,
+
+      joiningDate: employeeData.joiningDate
+        ? new Date(employeeData.joiningDate)
+        : undefined,
+
+      ...(departmentId && {
         department: {
           connect: {
-            id: data.departmentId,
+            id: departmentId,
           },
         },
       }),
-      ...(data.managerId && {
-        manager: {
-          connect: {
-            id: data.managerId,
-          },
-        },
-      }),
+
+      ...(managerId
+        ? {
+            manager: {
+              connect: {
+                id: managerId,
+              },
+            },
+          }
+        : {
+            manager: {
+              disconnect: true,
+            },
+          }),
     },
     include: {
       department: true,
@@ -122,7 +142,6 @@ export const updateEmployee = async (
     },
   });
 };
-
 export const deleteEmployee = async (id: string) => {
   return prisma.employee.delete({
     where: { id },
