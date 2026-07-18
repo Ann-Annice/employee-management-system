@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { loginEmployee, registerEmployee } from "../services/auth.service";
+import {
+  loginEmployee,
+  registerEmployee,
+} from "../services/auth.service";
 import { AuthRequest } from "../middleware/auth.middleware";
 import prisma from "../config/prisma";
 import {
@@ -16,6 +19,10 @@ export const register = async (
 
     const result = await registerEmployee({
       ...data,
+
+      // Convert null to undefined
+      managerId: data.managerId || undefined,
+
       profileImage: req.file
         ? `/uploads/${req.file.filename}`
         : undefined,
@@ -29,11 +36,17 @@ export const register = async (
   } catch (error: any) {
     return res.status(400).json({
       success: false,
-      message: error.errors?.[0]?.message || error.message,
+      message:
+        error.errors?.[0]?.message ||
+        error.message,
     });
   }
 };
-export const login = async (req: Request, res: Response) => {
+
+export const login = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const data = loginSchema.parse(req.body);
 
@@ -55,30 +68,35 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (_req: Request, res: Response) => {
+export const logout = async (
+  _req: Request,
+  res: Response
+) => {
   return res.status(200).json({
     success: true,
     message: "Logout successful",
   });
 };
+
 export const getProfile = async (
   req: AuthRequest,
   res: Response
 ) => {
   try {
-    const employee = await prisma.employee.findUnique({
-      where: {
-        id: req.user?.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        designation: true,
-        profileImage: true,
-      },
-    });
+    const employee =
+      await prisma.employee.findUnique({
+        where: {
+          id: req.user?.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          designation: true,
+          profileImage: true,
+        },
+      });
 
     if (!employee) {
       return res.status(404).json({
@@ -92,7 +110,7 @@ export const getProfile = async (
       data: employee,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({
       success: false,

@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { employeeSchema } from "../validations/employee.validation";
 import * as employeeService from "../services/employee.service";
-import fs from "fs";
-
 
 export const createEmployee = async (
   req: Request,
@@ -23,13 +21,13 @@ export const createEmployee = async (
         : null,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Employee created successfully",
       data: employee,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message:
         error.errors || error.issues || error.message,
@@ -63,12 +61,12 @@ export const getAllEmployees = async (
         sort
       );
 
-    res.json({
+    return res.json({
       success: true,
       data: employees,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -92,12 +90,12 @@ export const getEmployeeById = async (
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: employee,
     });
   } catch (error: any) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: error.message,
     });
@@ -115,7 +113,7 @@ export const updateEmployee = async (
       user.role !== "SUPER_ADMIN" &&
       user.role !== "HR_MANAGER"
     ) {
-      if (user.id !== req.params.id) {
+      if (user.id !== String(req.params.id)) {
         return res.status(403).json({
           success: false,
           message: "Access Denied",
@@ -132,7 +130,7 @@ export const updateEmployee = async (
 
     const employee =
       await employeeService.updateEmployee(
-        String(req.params.id)
+        String(req.params.id),
         {
           ...validatedData,
           ...(req.file && {
@@ -141,13 +139,13 @@ export const updateEmployee = async (
         }
       );
 
-    res.json({
+    return res.json({
       success: true,
       message: "Employee updated successfully",
       data: employee,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message:
         error.errors || error.issues || error.message,
@@ -164,12 +162,12 @@ export const deleteEmployee = async (
       String(req.params.id)
     );
 
-    res.json({
+    return res.json({
       success: true,
       message: "Employee deleted successfully",
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -184,12 +182,12 @@ export const getOrganizationTree = async (
     const tree =
       await employeeService.getOrganizationTree();
 
-    res.json({
+    return res.json({
       success: true,
       data: tree,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -206,12 +204,12 @@ export const getReportees = async (
         String(req.params.id)
       );
 
-    res.json({
+    return res.json({
       success: true,
       data: reportees,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -226,16 +224,16 @@ export const assignManager = async (
     const employee =
       await employeeService.assignManager(
         String(req.params.id),
-        req.body.managerId
+        String(req.body.managerId)
       );
 
-    res.json({
+    return res.json({
       success: true,
       message: "Manager assigned successfully",
       data: employee,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -246,9 +244,6 @@ export const importEmployees = async (
   req: Request,
   res: Response
 ) => {
-  console.log("REQ.FILE:", req.file);
-  console.log("REQ.BODY:", req.body);
-
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -257,7 +252,9 @@ export const importEmployees = async (
       });
     }
 
-    await employeeService.importEmployeesFromCSV(req.file.path);
+    await employeeService.importEmployeesFromCSV(
+      req.file.path
+    );
 
     return res.json({
       success: true,
@@ -270,15 +267,16 @@ export const importEmployees = async (
     });
   }
 };
+
 export const exportEmployees = async (
-  req: Request,
+  _req: Request,
   res: Response
 ) => {
   try {
-    const csv = await employeeService.exportEmployeesToCSV();
+    const csv =
+      await employeeService.exportEmployeesToCSV();
 
     res.header("Content-Type", "text/csv");
-
     res.attachment("employees.csv");
 
     return res.send(csv);

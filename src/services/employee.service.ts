@@ -275,7 +275,7 @@ export const assignManager = async (
   employeeId: string,
   managerId?: string
 ) => {
-
+  // Remove manager
   if (!managerId) {
     return prisma.employee.update({
       where: {
@@ -294,12 +294,56 @@ export const assignManager = async (
     });
   }
 
+  // Employee cannot manage themselves
   if (employeeId === managerId) {
     throw new Error("Employee cannot be their own manager.");
   }
 
-  // rest of your existing code...
-}
+  // Check circular reporting
+  let currentManagerId: string | null = managerId;
+
+  while (currentManagerId) {
+    if (currentManagerId === employeeId) {
+      throw new Error("Circular reporting is not allowed.");
+    }
+
+    const managerRecord: {
+      managerId: string | null;
+    } | null = await prisma.employee.findUnique({
+      where: {
+        id: currentManagerId,
+      },
+      select: {
+        managerId: true,
+      },
+    });
+
+    if (!managerRecord) {
+      break;
+    }
+
+    currentManagerId = managerRecord.managerId;
+  }
+
+  return prisma.employee.update({
+    where: {
+      id: employeeId,
+    },
+    data: {
+      manager: {
+        connect: {
+          id: managerId,
+        },
+      },
+    },
+    include: {
+      department: true,
+      manager: true,
+      reportees: true,
+    },
+  });
+};
+
 export const importEmployeesFromCSV = async (
   filePath: string
 ) => {
