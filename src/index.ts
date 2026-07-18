@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import path from "path";
 
 import authRoutes from "./routes/auth.routes";
 import employeeRoutes from "./routes/employee.routes";
@@ -14,9 +15,17 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../uploads"))
+);
 
 // Routes
 app.use("/api/auth", authRoutes);

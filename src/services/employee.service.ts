@@ -1,23 +1,43 @@
 import prisma from "../config/prisma";
+import fs from "fs";
+import csv from "csv-parser";
+import bcrypt from "bcrypt";
+import { Parser } from "json2csv";
 
 export const createEmployee = async (data: any) => {
   return prisma.employee.create({
     data: {
-      ...data,
+      employeeId: data.employeeId,
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+      designation: data.designation,
+      salary: Number(data.salary),
       joiningDate: new Date(data.joiningDate),
+
+      role: data.role ?? "EMPLOYEE",
+      status: data.status ?? "ACTIVE",
+
+      profileImage: data.profileImage ?? null,
+
       department: {
         connect: {
           id: data.departmentId,
         },
       },
-      ...(data.managerId && {
-        manager: {
-          connect: {
-            id: data.managerId,
-          },
-        },
-      }),
+
+      ...(data.managerId
+        ? {
+            manager: {
+              connect: {
+                id: data.managerId,
+              },
+            },
+          }
+        : {}),
     },
+
     include: {
       department: true,
       manager: true,
@@ -28,50 +48,85 @@ export const createEmployee = async (data: any) => {
 export const getEmployees = async (
   page = 1,
   limit = 10,
-  search = ""
+  search = "",
+  departmentId = "",
+  role = "",
+  status = "",
+  sort = ""
 ) => {
   const skip = (page - 1) * limit;
 
-  const where = search
-    ? {
-        OR: [
-          {
-            name: {
-              contains: search,
-              mode: "insensitive" as const,
-            },
-          },
-          {
-            email: {
-              contains: search,
-              mode: "insensitive" as const,
-            },
-          },
-          {
-            employeeId: {
-              contains: search,
-              mode: "insensitive" as const,
-            },
-          },
-        ],
-      }
-    : {};
+  const where: any = {
+  isDeleted: false,
+};
+
+  if (search) {
+    where.OR = [
+      {
+        name: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        email: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        employeeId: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  if (departmentId) {
+    where.departmentId = departmentId;
+  }
+
+  if (role) {
+    where.role = role;
+  }
+
+  if (status) {
+    where.status = status;
+  }
+
+  let orderBy: any = {
+    createdAt: "desc",
+  };
+
+  if (sort === "name") {
+    orderBy = {
+      name: "asc",
+    };
+  }
+
+  if (sort === "joiningDate") {
+    orderBy = {
+      joiningDate: "desc",
+    };
+  }
 
   const employees = await prisma.employee.findMany({
     where,
     skip,
     take: limit,
+    orderBy,
+
     include: {
       department: true,
       manager: true,
       reportees: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
   });
 
-  const total = await prisma.employee.count({ where });
+  const total = await prisma.employee.count({
+    where,
+  });
 
   return {
     employees,
@@ -83,7 +138,9 @@ export const getEmployees = async (
 
 export const getEmployeeById = async (id: string) => {
   return prisma.employee.findUnique({
-    where: { id },
+    where: {
+      id,
+    },
     include: {
       department: true,
       manager: true,
@@ -99,19 +156,41 @@ export const updateEmployee = async (
   const {
     departmentId,
     managerId,
-    ...employeeData
+    profileImage,
+    joiningDate,
+    salary,
+    role,
+    status,
+    ...rest
   } = data;
 
   return prisma.employee.update({
     where: {
       id,
     },
-    data: {
-      ...employeeData,
 
-      joiningDate: employeeData.joiningDate
-        ? new Date(employeeData.joiningDate)
-        : undefined,
+    data: {
+      ...rest,
+
+      ...(salary !== undefined && {
+        salary: Number(salary),
+      }),
+
+      ...(joiningDate && {
+        joiningDate: new Date(joiningDate),
+      }),
+
+      ...(role && {
+        role,
+      }),
+
+      ...(status && {
+        status,
+      }),
+
+      ...(profileImage && {
+        profileImage,
+      }),
 
       ...(departmentId && {
         department: {
@@ -135,6 +214,7 @@ export const updateEmployee = async (
             },
           }),
     },
+
     include: {
       department: true,
       manager: true,
@@ -142,19 +222,36 @@ export const updateEmployee = async (
     },
   });
 };
+
 export const deleteEmployee = async (id: string) => {
-  return prisma.employee.delete({
-    where: { id },
+  return prisma.employee.update({
+    where: {
+      id,
+    },
+    data: {
+      isDeleted: true,
+    },
   });
 };
 
 export const getOrganizationTree = async () => {
   return prisma.employee.findMany({
+    where: {
+  managerId: null,
+  isDeleted: false,
+},
+
     include: {
       department: true,
       manager: true,
-      reportees: true,
+      reportees: {
+        include: {
+          department: true,
+          reportees: true,
+        },
+      },
     },
+
     orderBy: {
       name: "asc",
     },
@@ -162,25 +259,56 @@ export const getOrganizationTree = async () => {
 };
 
 export const getReportees = async (id: string) => {
-  return prisma.employee.findMany({
-    where: {
-      managerId: id,
-    },
-    include: {
-      department: true,
-      manager: true,
-    },
-  });
+ return prisma.employee.findMany({
+  where: {
+  managerId: id,
+  isDeleted: false,
+},
+  include: {
+    department: true,
+    manager: true,
+  },
+});
 };
 
 export const assignManager = async (
   employeeId: string,
   managerId: string
 ) => {
+  if (employeeId === managerId) {
+    throw new Error(
+      "Employee cannot be their own manager."
+    );
+  }
+
+  let currentManagerId: string | null = managerId;
+
+  while (currentManagerId) {
+    if (currentManagerId === employeeId) {
+      throw new Error(
+        "Circular reporting is not allowed."
+      );
+    }
+
+    const manager = await prisma.employee.findUnique({
+      where: {
+        id: currentManagerId,
+      },
+      select: {
+        managerId: true,
+      },
+    });
+
+    if (!manager) break;
+
+    currentManagerId = manager.managerId;
+  }
+
   return prisma.employee.update({
     where: {
       id: employeeId,
     },
+
     data: {
       manager: {
         connect: {
@@ -188,10 +316,87 @@ export const assignManager = async (
         },
       },
     },
+
     include: {
       department: true,
       manager: true,
       reportees: true,
     },
   });
+};
+export const importEmployeesFromCSV = async (
+  filePath: string
+) => {
+  return new Promise(async (resolve, reject) => {
+    const employees: any[] = [];
+
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on("data", (row) => {
+        employees.push(row);
+      })
+      .on("end", async () => {
+        try {
+          for (const emp of employees) {
+            const hashedPassword = await bcrypt.hash(
+              emp.password || "password123",
+              10
+            );
+
+            await prisma.employee.create({
+              data: {
+                employeeId: emp.employeeId,
+                name: emp.name,
+                email: emp.email,
+                password: hashedPassword,
+                phone: emp.phone,
+                designation: emp.designation,
+                salary: Number(emp.salary),
+                joiningDate: new Date(emp.joiningDate),
+                role: emp.role || "EMPLOYEE",
+                status: emp.status || "ACTIVE",
+                department: {
+                  connect: {
+                    id: emp.departmentId,
+                  },
+                },
+              },
+            });
+          }
+
+          resolve(true);
+        } catch (err) {
+          reject(err);
+        }
+      });
+  });
+};
+export const exportEmployeesToCSV = async () => {
+  const employees = await prisma.employee.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      department: true,
+      manager: true,
+    },
+  });
+
+  const data = employees.map((emp) => ({
+    employeeId: emp.employeeId,
+    name: emp.name,
+    email: emp.email,
+    phone: emp.phone,
+    designation: emp.designation,
+    salary: emp.salary,
+    joiningDate: emp.joiningDate,
+    department: emp.department.name,
+    manager: emp.manager?.name || "",
+    role: emp.role,
+    status: emp.status,
+  }));
+
+  const parser = new Parser();
+
+  return parser.parse(data);
 };

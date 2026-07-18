@@ -6,25 +6,48 @@ import {
   updateDepartment,
   deleteDepartment,
 } from "../controllers/department.controller";
+
 import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
 
 const router = Router();
 
+// Every department route requires login
 router.use(authenticate);
 
-// GET all departments
-router.get("/", getDepartments);
+// SUPER_ADMIN and HR_MANAGER can view departments
+router.get(
+  "/",
+  authorize("SUPER_ADMIN", "HR_MANAGER"),
+  getDepartments
+);
 
-// GET department by ID
-router.get("/:id", getDepartmentById);
+// SUPER_ADMIN and HR_MANAGER can view a department
+router.get(
+  "/:id",
+  authorize("SUPER_ADMIN", "HR_MANAGER"),
+  getDepartmentById
+);
 
-// CREATE department
-router.post("/", createDepartment);
+// SUPER_ADMIN and HR_MANAGER can create
+router.post(
+  "/",
+  authorize("SUPER_ADMIN", "HR_MANAGER"),
+  createDepartment
+);
 
-// UPDATE department
-router.put("/:id", updateDepartment);
+// SUPER_ADMIN and HR_MANAGER can update
+router.put(
+  "/:id",
+  authorize("SUPER_ADMIN", "HR_MANAGER"),
+  updateDepartment
+);
 
-// DELETE department
-router.delete("/:id", deleteDepartment);
+// Only SUPER_ADMIN can delete
+router.delete(
+  "/:id",
+  authorize("SUPER_ADMIN"),
+  deleteDepartment
+);
 
 export default router;

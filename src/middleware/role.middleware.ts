@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { Response, NextFunction } from "express";
 import { AuthRequest } from "./auth.middleware";
 
 export const authorize =
@@ -18,7 +18,7 @@ export const authorize =
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: "Forbidden",
+        message: "Access Denied",
       });
     }
 

@@ -20,66 +20,72 @@ export default function AddEmployeePage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [managers, setManagers] = useState<Manager[]>([]);
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
 
   const [form, setForm] = useState({
-    employeeId: "",
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    designation: "",
-    salary: "",
-    joiningDate: "",
-    departmentId: "",
-    managerId: "",
-  });
+  employeeId: "",
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  designation: "",
+  salary: "",
+  joiningDate: "",
+  departmentId: "",
+  managerId: "",
+  role: "EMPLOYEE",
+  status: "ACTIVE",
+});
 
   useEffect(() => {
+    const role = localStorage.getItem("role");
+
+    if (role === "EMPLOYEE") {
+      router.push("/dashboard");
+      return;
+    }
+
     fetchData();
   }, []);
 
   const fetchData = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    // Get employees (for manager dropdown)
-    const employeeRes = await axios.get(
-      "http://localhost:5000/api/employees",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      const employeeRes = await axios.get(
+        "http://localhost:5000/api/employees",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setManagers(
-      employeeRes.data.data.employees.map((emp: any) => ({
-        id: emp.id,
-        name: emp.name,
-      }))
-    );
+      setManagers(
+        employeeRes.data.data.employees.map((emp: any) => ({
+          id: emp.id,
+          name: emp.name,
+        }))
+      );
 
-    // Get departments (for department dropdown)
-    const departmentRes = await axios.get(
-      "http://localhost:5000/api/departments",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      const departmentRes = await axios.get(
+        "http://localhost:5000/api/departments",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setDepartments(departmentRes.data.data);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to load data");
-  }
-};
+      setDepartments(departmentRes.data.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load data");
+    }
+  };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setForm({
       ...form,
@@ -97,19 +103,35 @@ export default function AddEmployeePage() {
 
       const token = localStorage.getItem("token");
 
+      const formData = new FormData();
+
+      formData.append("employeeId", form.employeeId);
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("password", form.password);
+      formData.append("phone", form.phone);
+      formData.append("designation", form.designation);
+      formData.append("salary", form.salary);
+      formData.append("joiningDate", form.joiningDate);
+      formData.append("departmentId", form.departmentId);
+      formData.append("role", form.role);
+      formData.append("status", form.status);
+
+      if (form.managerId) {
+        formData.append("managerId", form.managerId);
+      }
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
       await axios.post(
         "http://localhost:5000/api/auth/register",
-        {
-          ...form,
-          salary: Number(form.salary),
-          managerId:
-            form.managerId === ""
-              ? null
-              : form.managerId,
-        },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -128,23 +150,35 @@ export default function AddEmployeePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-50 to-cyan-100 p-8">
+      <div className="mx-auto max-w-5xl rounded-3xl bg-white p-10 shadow-2xl">
+        <div className="mb-10 flex items-center justify-between">
+  <div>
+    <h1 className="text-4xl font-bold text-slate-800">
+      Add Employee
+    </h1>
 
-      <div className="max-w-3xl mx-auto bg-white rounded shadow p-8">
+    <p className="mt-2 text-gray-500">
+      Fill in the employee details to create a new account.
+    </p>
+  </div>
 
-        <h1 className="text-3xl font-bold mb-8">
-          Add Employee
-        </h1>
-
+  <button
+    type="button"
+    onClick={() => router.push("/employees")}
+    className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
+  >
+    Back
+  </button>
+</div>
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-2 gap-5"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2"
         >
-
           <input
             name="employeeId"
             placeholder="Employee ID"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -152,7 +186,7 @@ export default function AddEmployeePage() {
           <input
             name="name"
             placeholder="Name"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -161,7 +195,7 @@ export default function AddEmployeePage() {
             name="email"
             type="email"
             placeholder="Email"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -170,7 +204,7 @@ export default function AddEmployeePage() {
             name="password"
             type="password"
             placeholder="Password"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -178,7 +212,7 @@ export default function AddEmployeePage() {
           <input
             name="phone"
             placeholder="Phone"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -186,7 +220,7 @@ export default function AddEmployeePage() {
           <input
             name="designation"
             placeholder="Designation"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -195,7 +229,7 @@ export default function AddEmployeePage() {
             name="salary"
             type="number"
             placeholder="Salary"
-            className="border p-3 rounded"
+           className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
@@ -203,14 +237,14 @@ export default function AddEmployeePage() {
           <input
             name="joiningDate"
             type="date"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           />
 
           <select
             name="departmentId"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
             required
           >
@@ -230,7 +264,7 @@ export default function AddEmployeePage() {
 
           <select
             name="managerId"
-            className="border p-3 rounded"
+            className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
             onChange={handleChange}
           >
             <option value="">
@@ -246,21 +280,68 @@ export default function AddEmployeePage() {
               </option>
             ))}
           </select>
+          <select
+  name="role"
+  value={form.role}
+  onChange={handleChange}
+  className="rounded-xl border border-gray-300 bg-gray-50 p-3 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+>
+  <option value="EMPLOYEE">Employee</option>
+  <option value="HR_MANAGER">HR Manager</option>
+  <option value="SUPER_ADMIN">Super Admin</option>
+</select>
+<select
+  name="status"
+  value={form.status}
+  onChange={handleChange}
+  className="rounded border p-3"
+>
+  <option value="ACTIVE">Active</option>
+  <option value="INACTIVE">Inactive</option>
+</select>
+
+          <div className="col-span-2">
+            <input
+  type="file"
+  accept="image/*"
+  onChange={(e) =>
+    setProfileImage(
+      e.target.files ? e.target.files[0] : null
+    )
+  }
+  className="w-full rounded-xl border border-dashed border-gray-400 bg-gray-50 p-4"
+/>
+{profileImage && (
+  <p className="mt-3 text-sm text-green-600">
+    Selected: {profileImage.name}
+  </p>
+)}
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setProfileImage(
+                  e.target.files
+                    ? e.target.files[0]
+                    : null
+                )
+              }
+              className="w-full rounded border p-3"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="col-span-2 bg-green-600 text-white p-3 rounded hover:bg-green-700"
+            className="col-span-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-4 text-lg font-semibold text-white shadow-lg transition hover:scale-[1.02] hover:from-blue-700 hover:to-indigo-700"
           >
             {loading
               ? "Creating..."
               : "Create Employee"}
           </button>
-
         </form>
-
       </div>
-
     </main>
   );
 }

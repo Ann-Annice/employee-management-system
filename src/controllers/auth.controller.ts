@@ -1,15 +1,25 @@
 import { Request, Response } from "express";
 import { loginEmployee, registerEmployee } from "../services/auth.service";
+import { AuthRequest } from "../middleware/auth.middleware";
+import prisma from "../config/prisma";
 import {
   loginSchema,
   registerSchema,
 } from "../validations/auth.validation";
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const data = registerSchema.parse(req.body);
 
-    const result = await registerEmployee(data);
+    const result = await registerEmployee({
+      ...data,
+      profileImage: req.file
+        ? `/uploads/${req.file.filename}`
+        : undefined,
+    });
 
     return res.status(201).json({
       success: true,
@@ -19,11 +29,10 @@ export const register = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(400).json({
       success: false,
-      message: error.message,
+      message: error.errors?.[0]?.message || error.message,
     });
   }
 };
-
 export const login = async (req: Request, res: Response) => {
   try {
     const data = loginSchema.parse(req.body);
@@ -51,4 +60,43 @@ export const logout = async (_req: Request, res: Response) => {
     success: true,
     message: "Logout successful",
   });
+};
+export const getProfile = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const employee = await prisma.employee.findUnique({
+      where: {
+        id: req.user?.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        designation: true,
+        profileImage: true,
+      },
+    });
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: employee,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };

@@ -13,6 +13,7 @@ interface RegisterDto {
   joiningDate: string;
   departmentId: string;
   managerId?: string;
+  profileImage?: string;
 }
 
 export const registerEmployee = async (data: RegisterDto) => {
@@ -38,10 +39,10 @@ export const registerEmployee = async (data: RegisterDto) => {
       email: data.email,
       password: hashedPassword,
       phone: data.phone,
-      designation: data.designation,
-      salary: data.salary,
-      joiningDate: new Date(data.joiningDate),
-
+     designation: data.designation,
+     salary: data.salary,
+     joiningDate: new Date(data.joiningDate),
+     profileImage: data.profileImage,
       department: {
         connect: {
           id: data.departmentId

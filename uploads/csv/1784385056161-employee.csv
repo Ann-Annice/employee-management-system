@@ -1,0 +1,4 @@
+employeeId,name,email,password,phone,designation,salary,joiningDate,role,status,departmentId
+EMP101,John Doe,john@example.com,password123,9876543210,Developer,50000,2026-07-18,EMPLOYEE,ACTIVE,cmromxh820000d4u8sql9bpgl
+EMP102,Jane Smith,jane@example.com,password123,9876543211,Designer,45000,2026-07-18,EMPLOYEE,ACTIVE,cmromxh820000d4u8sql9bpgl
+EMP103,Michael Brown,michael@example.com,password123,9876543212,Tester,40000,2026-07-18,HR_MANAGER,ACTIVE,cmromxh820000d4u8sql9bpgl
