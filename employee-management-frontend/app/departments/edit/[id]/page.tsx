@@ -90,64 +90,94 @@ export default function EditDepartmentPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-xl">
-        Loading...
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100">
+        <div className="rounded-3xl bg-white p-10 shadow-2xl">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
+
+          <p className="mt-5 text-lg font-semibold text-gray-700">
+            Loading Department...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-pink-50 via-fuchsia-50 to-purple-100 p-8">
 
-      <div className="max-w-xl mx-auto bg-white rounded shadow p-8">
+      <div className="mx-auto max-w-3xl">
 
-        <h1 className="text-3xl font-bold mb-8">
-          Edit Department
-        </h1>
+        <div className="mb-10">
+          <h1 className="text-5xl font-extrabold text-gray-800">
+            Edit Department
+          </h1>
 
-        <form
-          onSubmit={updateDepartment}
-          className="space-y-5"
-        >
+          <p className="mt-3 text-lg text-gray-600">
+            Update department information and keep your organization structured.
+          </p>
+        </div>
 
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Department Name"
-            className="w-full border p-3 rounded"
-            required
-          />
+        <div className="rounded-3xl bg-white p-10 shadow-2xl">
 
-          <input
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Department Description"
-            className="w-full border p-3 rounded"
-            required
-          />
+          <form
+            onSubmit={updateDepartment}
+            className="space-y-8"
+          >
 
-          <div className="flex gap-4">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Department Name
+              </label>
 
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
-            >
-              Update Department
-            </button>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter department name"
+                className="w-full rounded-xl border border-gray-300 p-4 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                required
+              />
+            </div>
 
-            <button
-              type="button"
-              onClick={() => router.push("/departments")}
-              className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700"
-            >
-              Cancel
-            </button>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Description
+              </label>
 
-          </div>
+              <input
+                type="text"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                placeholder="Enter department description"
+                className="w-full rounded-xl border border-gray-300 p-4 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-200"
+                required
+              />
+            </div>
 
-        </form>
+            <div className="flex flex-col gap-4 pt-4 md:flex-row">
+
+              <button
+                type="submit"
+                className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-4 font-semibold text-white shadow-lg transition hover:scale-105"
+              >
+                Save Changes
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/departments")}
+                className="rounded-xl bg-gray-200 px-8 py-4 font-semibold text-gray-700 transition hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
 
       </div>
 

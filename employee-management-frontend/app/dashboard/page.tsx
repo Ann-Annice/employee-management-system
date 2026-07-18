@@ -539,9 +539,13 @@ setProfileImage(profileRes.data.data.profileImage);
 
 <div className="mt-14">
 
-  <h2 className="mb-6 text-3xl font-bold text-gray-800">
-    My Workspace
-  </h2>
+  <h2
+  className={`mb-6 text-3xl font-bold ${
+    darkMode ? "text-white" : "text-gray-800"
+  }`}
+>
+  My Workspace
+</h2>
 
   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
 
@@ -762,75 +766,75 @@ setProfileImage(profileRes.data.data.profileImage);
 </div>
 
 
-            {/* Explore */}
+        {/* Explore */}
 
-<div className="mt-16">
+{role !== "EMPLOYEE" && (
+  <div className="mt-16">
 
-  <h2
-  className={`mb-6 text-3xl font-bold ${
-    darkMode ? "text-white" : "text-gray-800"
-  }`}
->
-  Explore
-</h2>
+    <h2
+      className={`mb-6 text-3xl font-bold ${
+        darkMode ? "text-white" : "text-gray-800"
+      }`}
+    >
+      Explore
+    </h2>
 
-  <div className="grid gap-8 md:grid-cols-2">
+    <div className="grid gap-8 md:grid-cols-2">
 
-    {/* SUPER ADMIN */}
+      {/* SUPER ADMIN */}
 
-    {role === "SUPER_ADMIN" && (
-      <>
+      {role === "SUPER_ADMIN" && (
+        <>
+          <Link
+            href="/employees"
+            className="group rounded-3xl border border-pink-100 bg-white/75 p-10 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02]"
+          >
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white shadow-lg">
+              <Users size={40} />
+            </div>
 
-        <Link
-          href="/employees"
-          className="group rounded-3xl border border-pink-100 bg-white/75 p-10 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02]"
-        >
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white shadow-lg">
-            <Users size={40} />
-          </div>
+            <h3 className="mt-8 text-3xl font-bold text-gray-800">
+              Employees
+            </h3>
 
-          <h3 className="mt-8 text-3xl font-bold text-gray-800">
-            Employees
-          </h3>
+            <p className="mt-4 text-lg leading-7 text-gray-600">
+              View, edit, update employee profiles, assign managers and manage your workforce.
+            </p>
 
-          <p className="mt-4 text-lg text-gray-600 leading-7">
-            View, edit, update employee profiles, assign managers and manage your workforce.
-          </p>
+            <div className="mt-8 flex items-center gap-2 text-lg font-semibold text-pink-600">
+              Open Employees
+              <ArrowRight className="transition-transform group-hover:translate-x-2" />
+            </div>
+          </Link>
 
-          <div className="mt-8 flex items-center gap-2 text-lg font-semibold text-pink-600">
-            Open Employees
-            <ArrowRight className="transition-transform group-hover:translate-x-2" />
-          </div>
-        </Link>
+          <Link
+            href="/departments"
+            className="group rounded-3xl border border-pink-100 bg-white/75 p-10 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02]"
+          >
+            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white shadow-lg">
+              <Building2 size={40} />
+            </div>
 
-        <Link
-          href="/departments"
-          className="group rounded-3xl border border-pink-100 bg-white/75 p-10 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02]"
-        >
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white shadow-lg">
-            <Building2 size={40} />
-          </div>
+            <h3 className="mt-8 text-3xl font-bold text-gray-800">
+              Departments
+            </h3>
 
-          <h3 className="mt-8 text-3xl font-bold text-gray-800">
-            Departments
-          </h3>
+            <p className="mt-4 text-lg leading-7 text-gray-600">
+              Create, edit and organize departments with a beautiful management interface.
+            </p>
 
-          <p className="mt-4 text-lg text-gray-600 leading-7">
-            Create, edit and organize departments with a beautiful management interface.
-          </p>
+            <div className="mt-8 flex items-center gap-2 text-lg font-semibold text-purple-600">
+              Open Departments
+              <ArrowRight className="transition-transform group-hover:translate-x-2" />
+            </div>
+          </Link>
+        </>
+      )}
 
-          <div className="mt-8 flex items-center gap-2 text-lg font-semibold text-purple-600">
-            Open Departments
-            <ArrowRight className="transition-transform group-hover:translate-x-2" />
-          </div>
-        </Link>
-
-      </>
-    )}
+    </div>
 
   </div>
-
-</div>
+)}
 
 </div>
 
@@ -841,5 +845,4 @@ setProfileImage(profileRes.data.data.profileImage);
 </main>
 );
 }
-
            
