@@ -3,7 +3,7 @@
 ## Base URL
 
 ```
-http://localhost:5000
+https://employee-management-system-production-e08b.up.railway.app
 ```
 
 ---
