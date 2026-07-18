@@ -21,7 +21,7 @@ export default function ImportEmployees() {
       setLoading(true);
 
       const res = await fetch(
-        "http://localhost:5000/api/employees/import",
+        "https://employee-management-system-production-e08b.up.railway.app/api/employees/import",
         {
           method: "POST",
           headers: {

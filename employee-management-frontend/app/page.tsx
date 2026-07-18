@@ -38,7 +38,7 @@ export default function LoginPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://employee-management-system-production-e08b.up.railway.app/api/auth/login",
         form
       );
 

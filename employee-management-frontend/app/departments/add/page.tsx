@@ -34,7 +34,7 @@ export default function AddDepartmentPage() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/departments",
+        "https://employee-management-system-production-e08b.up.railway.app/api/departments",
         form,
         {
           headers: {

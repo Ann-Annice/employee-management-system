@@ -46,7 +46,7 @@ export default function EmployeeDetails() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `http://localhost:5000/api/employees/${params.id}`,
+        `https://employee-management-system-production-e08b.up.railway.app/api/employees/${params.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function EmployeeDetails() {
             <div className="h-36 w-36 overflow-hidden rounded-full border-4 border-white shadow-lg">
               {employee.profileImage ? (
                <img
-  src={`http://localhost:5000${employee.profileImage}?t=${Date.now()}`}
+  src={`https://employee-management-system-production-e08b.up.railway.app${employee.profileImage}?t=${Date.now()}`}
   alt={employee.name}
   className="h-full w-full object-cover"
   onError={(e) => {

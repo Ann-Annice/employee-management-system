@@ -25,7 +25,7 @@ export default function ProfilePage() {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:5000/api/auth/profile", {
+        const res = await fetch("https://employee-management-system-production-e08b.up.railway.app/api/auth/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -72,7 +72,7 @@ export default function ProfilePage() {
         <div className="mb-10 flex justify-center">
           {profile.profileImage ? (
             <img
-              src={`http://localhost:5000${profile.profileImage}`}
+              src={`https://employee-management-system-production-e08b.up.railway.app${profile.profileImage}`}
               alt={profile.name}
               className="h-36 w-36 rounded-full border-4 border-pink-500 object-cover shadow-lg"
             />

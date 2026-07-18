@@ -75,7 +75,7 @@ export default function EditEmployeePage() {
         localStorage.getItem("token");
 
       const res = await axios.get(
-        `http://localhost:5000/api/employees/${id}`,
+        `https://employee-management-system-production-e08b.up.railway.app/api/employees/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ export default function EditEmployeePage() {
         localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/departments",
+        "https://employee-management-system-production-e08b.up.railway.app/api/departments",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -145,7 +145,7 @@ export default function EditEmployeePage() {
         localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/employees",
+        "https://employee-management-system-production-e08b.up.railway.app/api/employees",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -215,7 +215,7 @@ export default function EditEmployeePage() {
       }
 
       await axios.put(
-        `http://localhost:5000/api/employees/${id}`,
+        `https://employee-management-system-production-e08b.up.railway.app/api/employees/${id}`,
         formData,
         {
           headers: {

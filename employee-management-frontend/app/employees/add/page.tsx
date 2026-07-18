@@ -53,7 +53,7 @@ export default function AddEmployeePage() {
       const token = localStorage.getItem("token");
 
       const employeeRes = await axios.get(
-        "http://localhost:5000/api/employees",
+        "https://employee-management-system-production-e08b.up.railway.app/api/employees",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -69,7 +69,7 @@ export default function AddEmployeePage() {
       );
 
       const departmentRes = await axios.get(
-        "http://localhost:5000/api/departments",
+        "https://employee-management-system-production-e08b.up.railway.app/api/departments",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ export default function AddEmployeePage() {
       }
 
       await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://employee-management-system-production-e08b.up.railway.app/api/auth/register",
         formData,
         {
           headers: {

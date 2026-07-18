@@ -141,7 +141,7 @@ if (savedTheme === "true") {
       }
 
       const res = await axios.get(
-        "http://localhost:5000/api/dashboard/stats",
+        "https://employee-management-system-production-e08b.up.railway.app/api/dashboard/stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ if (savedTheme === "true") {
 
       setStats(res.data.data);
       const profileRes = await axios.get(
-  "http://localhost:5000/api/auth/profile",
+  "https://employee-management-system-production-e08b.up.railway.app/api/auth/profile",
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -296,7 +296,7 @@ setProfileImage(profileRes.data.data.profileImage);
   {profileImage ? (
 
     <img
-      src={`http://localhost:5000${profileImage}`}
+      src={`https://employee-management-system-production-e08b.up.railway.app${profileImage}`}
       alt={employeeName}
       className="h-full w-full object-cover"
     />

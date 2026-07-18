@@ -29,7 +29,7 @@ export default function OrganizationPage() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/employees/organization/tree",
+        "https://employee-management-system-production-e08b.up.railway.app/api/employees/organization/tree",
         {
           headers: {
             Authorization: `Bearer ${token}`,

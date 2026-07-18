@@ -40,7 +40,7 @@ export default function DepartmentsPage() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/departments",
+        "https://employee-management-system-production-e08b.up.railway.app/api/departments",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ export default function DepartmentsPage() {
       const token = localStorage.getItem("token");
 
       await axios.delete(
-        `http://localhost:5000/api/departments/${id}`,
+        `https://employee-management-system-production-e08b.up.railway.app/api/departments/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
