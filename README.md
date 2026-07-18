@@ -38,7 +38,12 @@ kate@test.com
 Password:
 123456
 
+## 🎥 Demo Video
 
+Watch the complete project demonstration here:
+
+**Google Drive:**  
+https://drive.google.com/file/d/1yLiQLr8FmHdWfmIGylca5H-farBRL9_u/view?usp=sharing
 
 ## Tech Stack
 
