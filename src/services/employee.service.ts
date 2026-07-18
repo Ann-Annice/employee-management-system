@@ -273,57 +273,33 @@ export const getReportees = async (id: string) => {
 
 export const assignManager = async (
   employeeId: string,
-  managerId: string
+  managerId?: string
 ) => {
-  if (employeeId === managerId) {
-    throw new Error(
-      "Employee cannot be their own manager."
-    );
-  }
 
-  let currentManagerId: string | null = managerId;
-
-  while (currentManagerId) {
-    if (currentManagerId === employeeId) {
-      throw new Error(
-        "Circular reporting is not allowed."
-      );
-    }
-
-    const manager = await prisma.employee.findUnique({
+  if (!managerId) {
+    return prisma.employee.update({
       where: {
-        id: currentManagerId,
+        id: employeeId,
       },
-      select: {
-        managerId: true,
-      },
-    });
-
-    if (!manager) break;
-
-    currentManagerId = manager.managerId;
-  }
-
-  return prisma.employee.update({
-    where: {
-      id: employeeId,
-    },
-
-    data: {
-      manager: {
-        connect: {
-          id: managerId,
+      data: {
+        manager: {
+          disconnect: true,
         },
       },
-    },
+      include: {
+        department: true,
+        manager: true,
+        reportees: true,
+      },
+    });
+  }
 
-    include: {
-      department: true,
-      manager: true,
-      reportees: true,
-    },
-  });
-};
+  if (employeeId === managerId) {
+    throw new Error("Employee cannot be their own manager.");
+  }
+
+  // rest of your existing code...
+}
 export const importEmployeesFromCSV = async (
   filePath: string
 ) => {

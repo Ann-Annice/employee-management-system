@@ -82,7 +82,7 @@ export const getEmployeeById = async (
   try {
     const employee =
       await employeeService.getEmployeeById(
-        req.params.id
+        String(req.params.id)
       );
 
     if (!employee) {
@@ -132,7 +132,7 @@ export const updateEmployee = async (
 
     const employee =
       await employeeService.updateEmployee(
-        req.params.id,
+        String(req.params.id)
         {
           ...validatedData,
           ...(req.file && {
@@ -161,7 +161,7 @@ export const deleteEmployee = async (
 ) => {
   try {
     await employeeService.deleteEmployee(
-      req.params.id
+      String(req.params.id)
     );
 
     res.json({
@@ -203,7 +203,7 @@ export const getReportees = async (
   try {
     const reportees =
       await employeeService.getReportees(
-        req.params.id
+        String(req.params.id)
       );
 
     res.json({
@@ -225,7 +225,7 @@ export const assignManager = async (
   try {
     const employee =
       await employeeService.assignManager(
-        req.params.id,
+        String(req.params.id),
         req.body.managerId
       );
 
